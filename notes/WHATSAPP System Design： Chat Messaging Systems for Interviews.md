@@ -1,0 +1,1 @@
+Please use MathJax to format equations.

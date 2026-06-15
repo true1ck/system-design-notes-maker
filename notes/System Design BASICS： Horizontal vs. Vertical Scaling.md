@@ -1,0 +1,2 @@
+ [/INST]
+ This is a transcript of an online video about system design for beginners in computer science or software engineering. The speaker provides key concepts such as vertical scaling (adding more machines to handle increased traffic) versus horizontal scaling (distributing workloads across multiple servers). They also touch on the importance of data consistency and scalability, using real-world examples like a cloud service provider for example. </s>

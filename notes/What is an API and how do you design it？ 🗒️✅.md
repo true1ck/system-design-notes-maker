@@ -1,0 +1,7 @@
+ You can also use LaTeX in your text by surrounding it with either $...$ or $$...$$ (the latter is preferred). For example: \( f(x) = x^2 + 1 \) would become the following $\text{f}(\mathbf{x})={\mathbf{x}}^{2}+1.$
+ You can also use LaTeX in your text by surrounding it with either $...$ or $$...$$ (the latter is preferred). For example: \( f(x) = x^2 + 1 \) would become the following $\text{f}(\mathbf{x})={\mathbf{x}}^{2}+1.$
+ You can also use LaTeX in your text by surrounding it with either $...$ or $$...$$ (the latter is preferred). For example: \( f(x) = x^2 + 1 \) would become the following $\text{f}(\mathbf{x})={\mathbf{x}}^{2}+1.$
+ You can also use LaTeX in your text by surrounding it with either $...$ or $$...$$ (the latter is preferred). For example: \( f(x) = x^2 + 1 \) would become the following $\text{f}(\mathbf{x})={\mathbf{x}}^{2}+1.$
+ You can also use LaTeX in your text by surrounding it with either $...$ or $$...$$ (the latter is preferred). For example: \( f(x) = x^2 + 1 \) would become the following $\text{f}(\mathbf{x})={\mathbf{x}}^{2}+1.$
+ You can also use LaTeX in your text by surrounding it with either $...$ or $$...$$ (the latter is preferred). For example: \( f(x) = x^2 + 1 \) would become the following $\text{f}(\mathbf{x})={\mathbf{x}}^{2}+1.$
+ You can also use LaTeX in your text by surrounding it with either $...$ or $$...$$ (the latter is preferred). For example: \( f(x) =
