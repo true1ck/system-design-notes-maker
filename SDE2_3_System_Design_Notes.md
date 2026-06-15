@@ -1100,3 +1100,26 @@ graph TD
 *   [ ] Did I communicate trade-offs clearly?
 
 ---
+
+## Appendix: Important Topics to Study (Missing from Transcripts)
+
+Based on a comprehensive review, the following core System Design topics and architectures are not covered in the transcripts but are crucial for SDE 2/3 interviews:
+
+### 1. Missing Core Concepts & Theory
+*   **CAP Theorem & PACELC Theorem:** Essential for explaining tradeoffs between consistency, availability, and latency during network partitions.
+*   **Rate Limiting Algorithms:** Token Bucket, Leaky Bucket, Fixed Window, and Sliding Window Log/Counter algorithms.
+*   **Real-time Communication:** Long Polling vs. WebSockets vs. Server-Sent Events (SSE).
+*   **Database Fundamentals:** ACID vs BASE properties, and Indexing (B-Trees vs LSM Trees).
+*   **API Gateway Pattern:** Routing, authentication, and rate-limiting.
+*   **Distributed Locking:** Coordinating processes across nodes (e.g., Redis Redlock or ZooKeeper).
+*   **Specialized Data Structures:** Bloom Filters, Count-Min Sketch, and Tries.
+
+### 2. Missing Classic System Design Architectures
+*   **URL Shortener (TinyURL):** Tests hashing functions, collision resolution, and 301 vs 302 redirects.
+*   **Search Autocomplete / Typeahead:** Tests Tries, pre-computation, and heavy read loads.
+*   **Distributed Web Crawler:** Tests graph traversal, cycle detection, and politeness policies.
+*   **Key-Value Store (DynamoDB):** Tests consistent hashing, replication, and gossip protocols.
+*   **Cloud File Storage (Google Drive / Dropbox):** Tests block/chunk storage and sync conflicts.
+*   **Ride-Sharing App (Uber / Lyft):** Tests geospatial querying and real-time state management.
+*   **Ticket Booking System (BookMyShow):** Tests Distributed Transactions and Optimistic/Pessimistic locking.
+*   **Distributed Rate Limiter:** Tests rate limiting across multiple servers using Redis.
