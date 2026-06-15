@@ -25,6 +25,9 @@ While the pizza parlor is a great SDE 1 analogy, an SDE 2/3 must discuss the **h
 
 *   **Stateless vs. Stateful:** When scaling horizontally (multiple chefs), the servers should ideally be *stateless*. If the garlic bread chef remembers a custom order but crashes, the state is lost. You must externalize state to a distributed cache (Redis/Memcached) or database.
 *   **Auto-scaling Policies:** In modern cloud environments (AWS/GCP), we don't just "hire more chefs"; we use Kubernetes (K8s) Horizontal Pod Autoscalers (HPA) based on CPU/Memory or custom metrics (e.g., queue length).
+*   **CDNs vs Edge Computing:** While both reduce latency by placing servers physically closer to the user, they serve different purposes:
+    *   *CDN (Content Delivery Network):* "Storage at the Edge." Caches **static** content (images, videos, JS) to offload the origin server and reduce bandwidth. (e.g., AWS CloudFront, Cloudflare).
+    *   *Edge Computing:* "Compute at the Edge." Executes **dynamic** lightweight backend code (Serverless functions) close to the user. Used for instant A/B testing, auth verification, or header manipulation without hitting the origin. (e.g., AWS Lambda@Edge, Cloudflare Workers).
 
 ### 3. Architecture Diagram
 
