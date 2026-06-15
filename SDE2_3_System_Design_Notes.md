@@ -1101,25 +1101,101 @@ graph TD
 
 ---
 
-## Appendix: Important Topics to Study (Missing from Transcripts)
+## Appendix: Expanded Notes on Missing SDE 2/3 Topics
 
-Based on a comprehensive review, the following core System Design topics and architectures are not covered in the transcripts but are crucial for SDE 2/3 interviews:
+The following topics were missing from your transcripts but are absolutely essential for passing SDE 2 and SDE 3 system design interviews. Here is what you need to know and learn for each.
+
+---
 
 ### 1. Missing Core Concepts & Theory
-*   **CAP Theorem & PACELC Theorem:** Essential for explaining tradeoffs between consistency, availability, and latency during network partitions.
-*   **Rate Limiting Algorithms:** Token Bucket, Leaky Bucket, Fixed Window, and Sliding Window Log/Counter algorithms.
-*   **Real-time Communication:** Long Polling vs. WebSockets vs. Server-Sent Events (SSE).
-*   **Database Fundamentals:** ACID vs BASE properties, and Indexing (B-Trees vs LSM Trees).
-*   **API Gateway Pattern:** Routing, authentication, and rate-limiting.
-*   **Distributed Locking:** Coordinating processes across nodes (e.g., Redis Redlock or ZooKeeper).
-*   **Specialized Data Structures:** Bloom Filters, Count-Min Sketch, and Tries.
+
+#### CAP Theorem & PACELC Theorem
+*   **What to learn:**
+    *   **CAP Theorem:** In the presence of a network Partition (P), you must choose between Consistency (C) and Availability (A). 
+    *   **PACELC Theorem:** An extension of CAP. It states: **P**artition ? **A**vailability or **C**onsistency **E**lse (if normal operation) **L**atency or **C**onsistency. This is crucial because even when there is NO network partition, you still have to trade off between latency (reading fast from a replica) and consistency (waiting for all replicas to sync).
+    *   **Application:** Use CP for financial transactions (e.g., HBase, MongoDB). Use AP for social media feeds (e.g., Cassandra, DynamoDB).
+
+#### Rate Limiting Algorithms
+*   **What to learn:**
+    *   **Token Bucket:** A bucket holds tokens at a fixed capacity. A token is added every `1/r` seconds. Requests consume tokens. (Used by Amazon API Gateway). Memory efficient and allows bursts.
+    *   **Leaky Bucket:** Requests enter a queue (bucket) and are processed at a fixed rate. Good for smoothing out traffic, but bursts will fill the queue and drop new requests.
+    *   **Fixed Window Counter:** Counters are mapped to a fixed time window (e.g., 12:00:00 to 12:01:00). Problem: Traffic spikes at the edges of the window allow double the rate limit.
+    *   **Sliding Window Log:** Stores timestamps of every request. Perfectly accurate but consumes too much memory.
+    *   **Sliding Window Counter:** A hybrid that uses the previous window's count weighted by time to estimate the current window. (The most optimal algorithm).
+
+#### Real-time Communication
+*   **What to learn:**
+    *   **Long Polling:** Client asks server for data. Server holds the request open until data is available. High overhead due to HTTP headers on every reconnect.
+    *   **WebSockets:** Bi-directional, persistent TCP connection. Extremely low latency. Best for chat apps (WhatsApp, Discord) and multiplayer games. Requires stateful session management.
+    *   **Server-Sent Events (SSE):** Uni-directional (Server to Client). Runs over standard HTTP. Best for real-time dashboards or stock tickers where the client only needs to receive, not send continuously.
+
+#### Database Fundamentals
+*   **What to learn:**
+    *   **ACID vs BASE:** ACID (Relational SQL) is strict and guarantees transaction safety. BASE (NoSQL) is flexible and guarantees eventual consistency.
+    *   **B-Trees (SQL Indexing):** Optimized for fast reads. Re-balancing the tree on writes is expensive.
+    *   **LSM Trees (NoSQL Indexing):** Log-Structured Merge Trees (used in Cassandra/RocksDB). Optimized for blistering fast sequential writes (append-only logs), but reads are slightly slower as they search multiple SSTables.
+
+#### API Gateway Pattern
+*   **What to learn:**
+    *   Instead of clients calling 50 microservices directly, they call an API Gateway. 
+    *   **Responsibilities:** SSL termination, Authentication, Rate Limiting, Request Routing, and Aggregation (solving the N+1 API call problem).
+
+#### Distributed Locking
+*   **What to learn:**
+    *   When multiple nodes need exclusive access to a shared resource (e.g., processing an order exactly once).
+    *   **Tools:** Redis (using the Redlock algorithm) or Apache ZooKeeper (using ephemeral nodes).
+    *   **Fencing Tokens:** If a node gets a lock but experiences a long Garbage Collection pause, its lock might expire. It then tries to write to the DB. A "Fencing Token" (an incrementing number attached to the lock) ensures the DB rejects writes from expired locks.
+
+#### Specialized Data Structures
+*   **What to learn:**
+    *   **Bloom Filters:** A space-efficient probabilistic data structure used to test whether an element is in a set. False positives are possible, but false negatives are not. Used by Cassandra to quickly check if a key exists in an SSTable before reading from disk.
+    *   **Count-Min Sketch:** Used for finding frequencies of events in massive streams (e.g., finding the top 10 trending hashtags on Twitter) in bounded memory.
+    *   **Tries (Prefix Trees):** Used for fast string prefix lookups (Search Autocomplete).
+
+---
 
 ### 2. Missing Classic System Design Architectures
-*   **URL Shortener (TinyURL):** Tests hashing functions, collision resolution, and 301 vs 302 redirects.
-*   **Search Autocomplete / Typeahead:** Tests Tries, pre-computation, and heavy read loads.
-*   **Distributed Web Crawler:** Tests graph traversal, cycle detection, and politeness policies.
-*   **Key-Value Store (DynamoDB):** Tests consistent hashing, replication, and gossip protocols.
-*   **Cloud File Storage (Google Drive / Dropbox):** Tests block/chunk storage and sync conflicts.
-*   **Ride-Sharing App (Uber / Lyft):** Tests geospatial querying and real-time state management.
-*   **Ticket Booking System (BookMyShow):** Tests Distributed Transactions and Optimistic/Pessimistic locking.
-*   **Distributed Rate Limiter:** Tests rate limiting across multiple servers using Redis.
+
+#### 1. Design a URL Shortener (TinyURL)
+*   **Focus Areas:**
+    *   **Hashing:** Base62 encoding allows for ~3.5 trillion URLs with just 7 characters (`[a-zA-Z0-9]`).
+    *   **Collision Handling:** What if two long URLs hash to the same value? Use an external counter (like ZooKeeper) or a distributed ID generator (Snowflake) to guarantee unique IDs, then Base62 encode the ID.
+    *   **Redirects:** Return `301 Moved Permanently` (browser caches it, less server load) vs `302 Found` (browser doesn't cache it, better for tracking analytics).
+
+#### 2. Design Search Autocomplete / Typeahead
+*   **Focus Areas:**
+    *   **Data Structure:** Tries. Each node stores a character and a cached list of the top 5 most popular queries passing through that node.
+    *   **Pre-computation:** You cannot compute the top 5 queries in real-time. Use a MapReduce job or Flink stream to aggregate frequencies offline and update the Trie cache every hour.
+    *   **Client Optimization:** Debounce client requests (wait 50ms after typing stops) to save server load.
+
+#### 3. Design a Distributed Web Crawler
+*   **Focus Areas:**
+    *   **BFS vs DFS:** Use Breadth-First Search with a distributed URL frontier queue (Kafka).
+    *   **Cycle/Duplicate Detection:** Use a Bloom Filter to quickly check if a URL has already been visited. 
+    *   **Politeness Policy:** Ensure you don't DDoS a single domain by staggering requests to the same host using queue routing.
+
+#### 4. Design a Key-Value Store (like DynamoDB)
+*   **Focus Areas:**
+    *   **Partitioning:** Consistent Hashing with virtual nodes.
+    *   **Replication:** Replicate data to N adjacent nodes in the hash ring.
+    *   **Consistency:** Quorum consensus (`W + R > N`).
+    *   **Conflict Resolution:** Vector Clocks to handle concurrent writes during network partitions.
+    *   **Failure Detection:** Gossip Protocol (nodes ping each other continuously to detect failures).
+
+#### 5. Design Cloud File Storage (Google Drive / Dropbox)
+*   **Focus Areas:**
+    *   **Chunking:** Do not upload a 5GB video as one file. Split it into 4MB chunks. If a chunk fails, you only retry that 4MB chunk.
+    *   **Deduplication:** Hash the chunks (SHA-256). If a user uploads a file that already exists, just point their metadata to the existing chunks.
+    *   **Sync Conflicts:** Use an offline-first queue and versioning to resolve conflicts when two offline users edit the same document and reconnect.
+
+#### 6. Design a Ride-Sharing App (Uber / Lyft)
+*   **Focus Areas:**
+    *   **Location Tracking:** Drivers ping their location via WebSockets every 3 seconds.
+    *   **Geospatial Indexing:** Use QuadTrees or GeoHashes (Redis Geo) to partition the map and quickly query "all drivers within a 2-mile radius".
+    *   **Dispatch System:** A state machine that transitions the ride from matching -> accepted -> picked up -> dropped off.
+
+#### 7. Design a Ticket Booking System (BookMyShow)
+*   **Focus Areas:**
+    *   **High Concurrency / Hotspots:** 100,000 people trying to book 50 Taylor Swift tickets at the same time.
+    *   **Locking:** You must use **Pessimistic Locking** (locking the row `FOR UPDATE` in SQL) or Redis distributed locks to hold the seat for 5 minutes while the user completes payment.
+    *   **Distributed Transactions:** If the payment fails, the seat lock must be released using a Saga or an expiration TTL on the lock.
